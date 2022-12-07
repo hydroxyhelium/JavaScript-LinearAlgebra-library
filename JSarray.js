@@ -1,7 +1,7 @@
 class JSarray{ 
     constructor(array){
         this.array = [];
-        this.size = []
+        this.size = [];
 
         var complex = false; 
 
@@ -154,6 +154,55 @@ class JSarray{
         }
        }
     }
+
+    elementproduct(jsarray){
+        if(!this.complex){
+            for(var i=0; i<this.array.length; ++i){
+                this.array[i] *= jsarray.getelement(i)
+            }
+        }
+        else{
+            console.log(jsarray.getelement[i])
+            for(var i=0; i<this.array.length; ++i){
+                this.array[i].elementproduct(jsarray[i])
+            }
+        }
+    }
+}
+
+// [2, 3]
+// [0, 0, 0]
+
+CreateZeroArray = (sizeArray)=>{
+
+    var temp = []
+    if(sizeArray.length === 1){
+
+        var num1 = sizeArray[0]
+
+        for(var i=0; i<num1; ++i){
+            temp.push(0)
+        }
+
+        return temp
+    }
+    else{
+
+        var subarray = CreateZeroArray(sizeArray.slice(1))
+        var num1 = sizeArray[0]
+
+        for(var i=0; i<num1; ++i){
+            temp.push(subarray)
+        }
+        
+        return temp
+    }
+}
+
+
+
+CreateZeroJSArray = (sizeArray)=>{
+    return new JSarray(CreateZeroArray(sizeArray))
 }
 
 
