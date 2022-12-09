@@ -133,39 +133,55 @@ class JSarray{
             throw 'tensors cannot be added'            
         }
 
-        for(var i=0; i<this.size[0]; ++i){
-            //console.log(jsarray.array[i])
-            if(this.array[i] instanceof JSarray){
-                this.array[i].add(jsarray.array[i])
-            }
-            else{
-                this.array[i]=this.array[i]+jsarray.array[i]; 
-            }
-        }
+        var temp = []
+
+        return new JSarray(AddHelper(this, jsarray))
     }
 
     mutiply(num){
-       for(var i=0; i<this.size[0]; ++i){
-        if(this.array[i] instanceof JSarray){
-            this.array[i].mutiply(num); 
-        }
-        else{
-            this.array[i] = this.array[i]*num; 
-        }
-       }
+        return new JSarray(MultHelper(this, num))
     }
 
     elementproduct(jsarray){
+       return new JSarray(ElementProductHelper(this, jsarray))
+    }
+
+    matrixproduct(jsarray){
+        // do the safety to check if the two matrices can actually be mulitplied. 
+
+        var output = []
+
         if(!this.complex){
-            for(var i=0; i<this.array.length; ++i){
-                this.array[i] *= jsarray.getelement(i)
-            }
+            return this.dotproduct(jsarray)
         }
+
         else{
-            console.log(jsarray.getelement[i])
-            for(var i=0; i<this.array.length; ++i){
-                this.array[i].elementproduct(jsarray[i])
+
+            var i = this.array.length
+            var j = jsarray.array.length
+            var k = jsarray.array[0].array.length
+
+            console.log(i)
+            console.log(j)
+            console.log(k)
+
+
+            for(var m=0; m<i; ++m){ 
+                var temp = []
+
+                for(var q=0; q<k; ++q){
+                    var element = 0 
+                    for(var p=0; p<j; ++p){
+                        element += this.array[m].getelement(p)*jsarray.array[p].getelement(q)                    
+                    }
+
+                    console.log(element)
+                    temp.push(element)
+                }
+                output.push(temp)
             }
+
+            return new JSarray(output)
         }
     }
 }
@@ -205,5 +221,60 @@ CreateZeroJSArray = (sizeArray)=>{
     return new JSarray(CreateZeroArray(sizeArray))
 }
 
+// assumes that the two arrays are addable
+AddHelper = (jsarray1, jsarray2)=>{
 
-export {JSarray}
+    var temp = []
+
+    for(var i=0; i<jsarray1.array.length; ++i){
+
+        if(jsarray1.array[i] instanceof JSarray){
+            temp.push(AddHelper(jsarray1.array[i], jsarray2.array[i]))
+        }
+        else{
+            temp.push(jsarray1.array[i]+jsarray2.array[i])
+        }
+
+    }
+
+    return temp
+}
+
+MultHelper = (jsarray, num)=>{
+    var temp = []
+
+    for(var i=0; i<jsarray.array.length; ++i){
+
+        if(jsarray.array[i] instanceof JSarray){
+            temp.push(MultHelper(jsarray.array[i], num))
+        }
+        else{
+            temp.push(jsarray.array[i]*num)
+        }
+    }
+
+    return temp
+}
+
+ElementProductHelper = (jsarray1, jsarray2)=>{
+    // this assumes that a total internal product is possible between the two 
+    var temp = []
+    var size = jsarray1.array.length
+
+    for(var i=0; i<size; ++i){
+
+        if(jsarray1.array[i] instanceof JSarray){
+            temp.push(ElementProductHelper(jsarray1.getelement(i), jsarray2.getelement(i)))
+        }
+        
+        else{
+            temp.push(jsarray1.getelement(i)*jsarray2.getelement(i))
+        }
+    }
+
+    return temp
+}
+
+
+
+export {JSarray, CreateZeroArray}
